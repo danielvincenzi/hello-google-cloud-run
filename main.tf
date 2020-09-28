@@ -1,5 +1,5 @@
 provider "google" {
-    project = ""
+    project = "myfirstproject-dev-290816"
 }
 
 resource "google_cloud_run_service" "default" {
