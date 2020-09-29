@@ -6,4 +6,4 @@ spec:
   template:
     spec:
       containers:
-      - image: gcr.io/cloudrun/hello
+        - image: gcr.io/cloudrun/hello

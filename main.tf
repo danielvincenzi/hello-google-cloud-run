@@ -1,37 +1,38 @@
 provider "google" {
-    project = "myfirstproject-dev-290816"
+  version = "3.5.0"
 }
 
 resource "google_cloud_run_service" "default" {
-    name     = "hello-google-cloud-run"
-    location = "us-east1"
+  name     = var.name
+  location = var.region
+  project  = var.project
 
-    metadata {
-      annotations = {
-        "run.googleapis.com/client-name" = "terraform"
+  metadata {
+    annotations = {
+      "run.googleapis.com/client-name" = "terraform"
+    }
+  }
+
+  template {
+    spec {
+      containers {
+        image = "gcr.io/cloudrun/hello"
       }
     }
+  }
+}
 
-    template {
-      spec {
-        containers {
-          image = "gcr.io/cloudrun/hello"
-        }
-      }
-    }
- }
+data "google_iam_policy" "noauth" {
+  binding {
+    role    = "roles/run.invoker"
+    members = ["allUsers"]
+  }
+}
 
- data "google_iam_policy" "noauth" {
-   binding {
-     role = "roles/run.invoker"
-     members = ["allUsers"]
-   }
- }
+resource "google_cloud_run_service_iam_policy" "noauth" {
+  service  = google_cloud_run_service.default.name
+  location = google_cloud_run_service.default.location
+  project  = google_cloud_run_service.default.project
 
- resource "google_cloud_run_service_iam_policy" "noauth" {
-   location    = google_cloud_run_service.default.location
-   project     = google_cloud_run_service.default.project
-   service     = google_cloud_run_service.default.name
-
-   policy_data = data.google_iam_policy.noauth.policy_data
+  policy_data = data.google_iam_policy.noauth.policy_data
 }
